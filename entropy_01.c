@@ -66,8 +66,8 @@ static int chi1_slot(long data0, long data1);
 static char *usage =
 "usage: %s [-m maxlen] [-i ignsize]\n"
 "\n"
-"\t-m maxlen	dont scan > maxlen octets per line (def: BUFSIZ)\n"
-"\t-i ignsize	ignore lines < ignsize octets (def: 0)\n";
+"\t-m maxlen	do not scan more than maxlen octets per line (def: BUFSIZ)\n"
+"\t-i ignsize	ignore lines smaller than ignsize octets (def: 0)\n";
 static char *program;	/* our name */
 
 
@@ -133,11 +133,24 @@ main(int argc, char *argv[])
     minlen = maxlen;
     while (fgets(line, BUFSIZ, stdin) != NULL) {
 	int len;	/* current line length */
+	char *p;
 
 	/*
 	 * firewall
 	 */
     	line[BUFSIZ] = '\0';
+
+	/*
+	 * convert the trailing newline or return to a NUL
+	 */
+	p = strrchr(line, '\n');
+	if (p != NULL) {
+	    *p = '\0';
+	}
+	p = strrchr(line, '\r');
+	if (p != NULL) {
+	    *p = '\0';
+	}
 
 	/*
 	 * ignore lines that are too small
@@ -152,10 +165,10 @@ main(int argc, char *argv[])
 	}
 
 	/*
-	 * count non-"0"'s on the line until EOL or end of buffer or minlen
+	 * count "1"'s on the line until EOL or end of buffer or minlen
 	 */
 	for (i=0; line[i] != '\0' && line[i] != '\n' && i < minlen; ++i) {
-	    if (line[i] != '0') {
+	    if (line[i] == '1') {
 		++bit_sum[i];
 	    }
 	}
