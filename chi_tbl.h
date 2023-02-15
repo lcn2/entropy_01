@@ -1,4 +1,4 @@
-/* $Id: chi_tbl.h,v 4.3 1991/02/18 16:21:10 chongo Exp $  */
+/* $Id: chi_tbl.h,v 1.1 2002/03/26 21:39:13 chongo Exp $  */
 /*
  * chi_tbl - chi square table
  *

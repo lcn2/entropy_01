@@ -1,9 +1,9 @@
 /*
  * entropy_01 - determine the entropy from lines of "0" and "1" chars
  *
- * @(#) $Revision: 1.3 $
- * @(#) $Id: entropy_01.c,v 1.3 2002/03/02 11:14:03 chongo Exp $
- * @(#) $Source: /home/chongo/bench/sample/RCS/entropy_01.c,v $
+ * @(#) $Revision: 1.2 $
+ * @(#) $Id: entropy_01.c,v 1.2 2002/08/15 21:21:52 chongo Exp $
+ * @(#) $Source: /usr/local/src/bin/entropy_01/RCS/entropy_01.c,v $
  *
  * We will perform tally stats on a collection of lines containing the
  * same number of "0" and "1" characters.

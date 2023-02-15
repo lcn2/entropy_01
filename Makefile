@@ -2,9 +2,9 @@
 #
 # entropy_01 - determine the entropy from lines of "0" and "1" chars
 #
-# @(#) $Revision: 1.4 $
-# @(#) $Id: Makefile,v 1.4 1999/11/08 04:25:08 chongo Exp $
-# @(#) $Source: /usr/local/src/cmd/udate/RCS/Makefile,v $
+# @(#) $Revision: 1.1 $
+# @(#) $Id: Makefile,v 1.1 2002/03/26 21:39:13 chongo Exp $
+# @(#) $Source: /usr/local/src/bin/entropy_01/RCS/Makefile,v $
 #
 # Please do not copyright this Makefile.  This Makefile is in the public domain.
 #
