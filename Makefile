@@ -2,11 +2,17 @@
 #
 # entropy_01 - determine the entropy from lines of "0" and "1" chars
 #
-# @(#) $Revision: 1.1 $
-# @(#) $Id: Makefile,v 1.1 2002/03/26 21:39:13 chongo Exp $
-# @(#) $Source: /usr/local/src/bin/entropy_01/RCS/Makefile,v $
+# Copyright (c) 2003-2006,2023 by Landon Curt Noll.  All Rights Reserved.
 #
-# Please do not copyright this Makefile.  This Makefile is in the public domain.
+# Permission to use, copy, modify, and distribute this software and
+# its documentation for any purpose and without fee is hereby granted,
+# provided that the above copyright, this permission notice and text
+# this comment, and the disclaimer below appear in all of the following:
+#
+#       supporting documentation
+#       source copies
+#       source works derived from this source
+#       binaries derived from this source or from derived source
 #
 # LANDON CURT NOLL DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE,
 # INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO
@@ -16,16 +22,16 @@
 # OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 # PERFORMANCE OF THIS SOFTWARE.
 #
-# chongo <was here> /\oo/\
+# chongo (Landon Curt Noll, http://www.isthe.com/chongo/index.html) /\oo/\
 #
-# Share and enjoy!
+# Share and enjoy! :-)
 
-SHELL=/bin/sh
-CC=cc
-CFLAGS=-O3
-BINMODE=0555
-DESTBIN=/usr/local/bin
-INSTALL=install
+SHELL= bash
+CC= cc
+CFLAGS= -O3 -g3
+BINMODE= 0555
+DESTBIN= /usr/local/bin
+INSTALL= install
 
 all: entropy_01
 
@@ -36,7 +42,7 @@ install: all
 	${INSTALL} -m ${BINMODE} entropy_01 ${DESTBIN}
 
 clean:
-	rm -f entropy_01.o
+	${RM} -f entropy_01.o
 
 clobber: clean
-	-rm -f entropy_01
+	${RM} -f entropy_01
