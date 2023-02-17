@@ -1,4 +1,4 @@
-#!/bin/make
+#!/usr/bin/env make
 #
 # entropy_01 - determine the entropy from lines of "0" and "1" chars
 #
