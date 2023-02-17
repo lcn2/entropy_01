@@ -3,7 +3,7 @@
  *
  * @(#) $Revision: 1.2 $
  * @(#) $Id: entropy_01.c,v 1.2 2002/08/15 21:21:52 chongo Exp $
- * @(#) $Source: /usr/local/src/bin/entropy_01/RCS/entropy_01.c,v $
+ * @(#) $Source: /usr/local/src/cmd/entropy_01/RCS/entropy_01.c,v $
  *
  * We will perform tally stats on a collection of lines containing the
  * same number of "0" and "1" characters.
@@ -16,7 +16,7 @@
  *
  * NOTE: We will consider anything not a "0" char to be a "1" character.
  *
- * Copyright (c) 2001 by Landon Curt Noll.  All Rights Reserved.
+ * Copyright (c) 2001,2021 by Landon Curt Noll.  All Rights Reserved.
  *
  * Permission to use, copy, modify, and distribute this software and
  * its documentation for any purpose and without fee is hereby granted,
@@ -183,9 +183,9 @@ main(int argc, char *argv[])
      * empty or single count firewall
      */
     if (linecnt <= 0) {
-	printf("no lines longer than %d octets\n", ignsize);
+	printf("no lines longer than %ld octets\n", ignsize);
     } else if (linecnt < 2) {
-	printf("only 1 line longer than %d octets\n", ignsize);
+	printf("only 1 line longer than %ld octets\n", ignsize);
     }
 
     /*
@@ -213,9 +213,9 @@ main(int argc, char *argv[])
      * print stats
      */
     printf("\nchi^2 distribution\n");
-    printf("lines counted: %d\n", linecnt);
-    printf("lines ignored: %d\n", skipcnt);
-    printf("shortest processed line: %d octets\n", minlen);
+    printf("lines counted: %ld\n", linecnt);
+    printf("lines ignored: %ld\n", skipcnt);
+    printf("shortest processed line: %ld octets\n", minlen);
     printf("octets processed: %lld octets\n\n", (llng)minlen*(llng)linecnt);
     entropy = 0.0;
     for (i=0; i < CHI_PROB-1; ++i) {
