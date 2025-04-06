@@ -1,10 +1,6 @@
 /*
  * entropy_01 - determine the entropy from lines of "0" and "1" chars
  *
- * @(#) $Revision: 1.2 $
- * @(#) $Id: entropy_01.c,v 1.2 2002/08/15 21:21:52 chongo Exp $
- * @(#) $Source: /usr/local/src/cmd/entropy_01/RCS/entropy_01.c,v $
- *
  * We will perform tally stats on a collection of lines containing the
  * same number of "0" and "1" characters.
  *
@@ -14,6 +10,7 @@
  *	-l maxlen	do not scan more than maxlen octets per line
  *	-i ignsize	ignore files smaller than ignsize octets
  *
+ * NOTE: We ignore newlines and carriage returns.
  * NOTE: We will consider anything not a "0" char to be a "1" character.
  *
  * Copyright (c) 2001,2021 by Landon Curt Noll.  All Rights Reserved.
@@ -53,22 +50,88 @@
 #include <stdlib.h>
 #include "chi_tbl.h"
 
+
 /*
- * forward declarations
+ * official version
  */
-typedef long long llng;
+#define VERSION "1.2.1 2025-04-05"          /* format: major.minor YYYY-MM-DD */
+
+
+/*
+ * usage message
+ */
+static const char * const usage =
+  "usage: %s [-h] [-V] [-m maxlen] [-i ignsize]\n"
+        "\n"
+        "    -h            print help message and exit\n"
+        "    -V            print version string and exit\n"
+        "\n"
+        "    -m maxlen     do not scan more than maxlen octets per line (def: BUFSIZ)\n"
+        "    -i ignsize    ignore lines smaller than ignsize octets (def: 0)\n"
+        "\n"
+        "Exit codes:\n"
+        "    0         all OK\n"
+        "    1         -o offset beyond arg count\n"
+        "    2         -h and help string printed or -V and version string printed\n"
+        "    3         command line error\n"
+        " >= 10        internal error\n"
+        "\n"
+        "%s version: %s\n";
+
+
+/*
+ * static declarations
+ */
+static char *program = NULL;    /* our name */
+static char *prog = NULL;       /* basename of program */
+static const char * const version = VERSION;
 static int chi1_slot(long data0, long data1);
+/**/
+static void pr_usage(FILE *stream);
 
 
 /*
- * private globals
+ * pr_usage - print usage message
+ *
+ * given:
+ *
+ *    stream - print usage message on stream, NULL ==> stderr
  */
-static char *usage =
-"usage: %s [-m maxlen] [-i ignsize]\n"
-"\n"
-"\t-m maxlen	do not scan more than maxlen octets per line (def: BUFSIZ)\n"
-"\t-i ignsize	ignore lines smaller than ignsize octets (def: 0)\n";
-static char *program;	/* our name */
+static void
+pr_usage(FILE *stream)
+{
+    /*
+     * NULL stream means stderr
+     */
+    if (stream == NULL) {
+        stream = stderr;
+    }
+
+    /*
+     * firewall - change program if NULL
+     */
+    if (program == NULL) {
+        program = "((NULL))";
+    }
+
+    /*
+     * firewall set name if NULL
+     */
+    if (prog == NULL) {
+        prog = rindex(program, '/');
+    }
+    /* paranoia if no / is found */
+    if (prog == NULL) {
+        prog = program;
+    } else {
+        ++prog;
+    }
+
+    /*
+     * print usage message to stderr
+     */
+    fprintf(stream, usage, program, prog, version);
+}
 
 
 int
@@ -80,9 +143,8 @@ main(int argc, char *argv[])
     long ignsize;		/* ignore lines shorter than ignsize chars */
     long chi_lvl_tally[CHI_PROB];	/* tally of chi-square levels found */
     long linecnt;		/* number of lines processed */
-    long minlen;		/* length of shortest non-ignroed line */
+    long minlen;		/* length of shortest non-ignored line */
     long skipcnt;		/* number of lines ignored or skipped */
-    llng bitcnt;		/* number of "0" and "1" char bits processed */
     double entropy;		/* entropy estimate */
     extern char *optarg;	/* option argument */
     extern int optind;		/* argv index of the next arg */
@@ -95,35 +157,66 @@ main(int argc, char *argv[])
     skipcnt = 0;
     ignsize = 0;
     linecnt = 0;
-    for (i=0; i < BUFSIZ+1; ++i) {
-	bit_sum[i] = 0;
-    }
+    memset(line, 0, sizeof(line));
+    memset(bit_sum, 0, sizeof(bit_sum));
+    memset(chi_lvl_tally, 0, sizeof(chi_lvl_tally));
 
     /*
      * parse args
      */
     program = argv[0];
-    while ((i = getopt(argc, argv, "m:i:")) != -1) {
+    while ((i = getopt(argc, argv, "hVm:i:")) != -1) {
         switch (i) {
-	case 'm':
+
+	case 'h':                   /* -h - print help message and exit */
+            pr_usage(stderr);
+            exit(2); /* ooo */
+            /*NOTREACHED*/
+
+	case 'V':                   /* -V - print version string and exit */
+            (void) printf("%s\n", version);
+            exit(2); /* ooo */
+            /*NOTREACHED*/
+
+	case 'm':		    /* -m maxlen - do not scan more than maxlen octets per line */
 	    maxlen = strtol(optarg, NULL, 0);
 	    if (maxlen <= 0 || maxlen > BUFSIZ) {
-	    	fprintf(stderr, "%s: -m value: %ld must be > 0 and <= %d\n",
+		fprintf(stderr, "%s: -m value: %ld must be > 0 and <= %d\n",
 				program, maxlen, BUFSIZ);
-		exit(1);
+		pr_usage(stderr);
+		exit(3); /* ooo */
+		/*NOTREACHED*/
 	    }
 	    break;
-	case 'i':
+
+	case 'i':		    /* -i ignsize - ignore lines smaller than ignsize octets */
 	    ignsize = strtol(optarg, NULL, 0);
 	    if (ignsize <= 0) {
-	    	fprintf(stderr, "%s: -i value: %ld must be > 0\n",
+		fprintf(stderr, "%s: -i value: %ld must be > 0\n",
 				program, ignsize);
-		exit(3);
+		pr_usage(stderr);
+		exit(3); /* ooo */
+		/*NOTREACHED*/
 	    }
 	    break;
-	default:
-	    fprintf(stderr, usage, program);
-	    exit(4);
+
+	case ':':
+            (void) fprintf(stderr, "%s: ERROR: requires an argument -- %c\n", program, optopt);
+            pr_usage(stderr);
+            exit(3); /* ooo */
+            /*NOTREACHED*/
+
+        case '?':
+            (void) fprintf(stderr, "%s: ERROR: illegal option -- %c\n", program, optopt);
+            pr_usage(stderr);
+            exit(3); /* ooo */
+            /*NOTREACHED*/
+
+        default:
+            fprintf(stderr, "%s: ERROR: invalid -flag\n", program);
+            pr_usage(stderr);
+            exit(3); /* ooo */
+            /*NOTREACHED*/
 	}
     }
 
@@ -138,7 +231,7 @@ main(int argc, char *argv[])
 	/*
 	 * firewall
 	 */
-    	line[BUFSIZ] = '\0';
+	line[BUFSIZ] = '\0';
 
 	/*
 	 * convert the trailing newline or return to a NUL
@@ -194,7 +287,7 @@ main(int argc, char *argv[])
     for (i=0; i < minlen; ++i) {
 	int level;		/* return from chi_slot() */
 
-    	/*
+	/*
 	 * determine the chi-square level
 	 */
 	level = chi1_slot(bit_sum[i], linecnt - bit_sum[i]);
@@ -216,13 +309,13 @@ main(int argc, char *argv[])
     printf("lines counted: %ld\n", linecnt);
     printf("lines ignored: %ld\n", skipcnt);
     printf("shortest processed line: %ld octets\n", minlen);
-    printf("octets processed: %lld octets\n\n", (llng)minlen*(llng)linecnt);
+    printf("octets processed: %lld octets\n\n", (long long)minlen*(long long)linecnt);
     entropy = 0.0;
     for (i=0; i < CHI_PROB-1; ++i) {
 	printf("chi^2 [%.2f-%.2f]%%:\t%ld\t%6.2f%%\n",
 	       100.0*chiprob[i+1], 100.0*chiprob[i], chi_lvl_tally[i],
 	       100.0*(double)chi_lvl_tally[i]/((double)minlen));
-    	entropy += (double)chiprob[i+1]*(double)chi_lvl_tally[i];
+	entropy += (double)chiprob[i+1]*(double)chi_lvl_tally[i];
     }
     printf("chi^2 [excess]:\t\t%ld\t%6.2f%%\n",
 	chi_lvl_tally[CHI_PROB-1],
@@ -276,7 +369,7 @@ chi1_slot(long slot0, long slot1)
      * calculate chi-square
      */
     chisquare = (((double)slot0-expected) * ((double)slot0-expected) +
-    		 ((double)slot1-expected) * ((double)slot1-expected)) /
+		 ((double)slot1-expected) * ((double)slot1-expected)) /
 		 expected;
 
     /*
