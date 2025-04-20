@@ -459,7 +459,7 @@ static double chiprobx[CHI_PROBX] = {
 };
 
 /*
- * chi_x - chi square x(p) values for aproximating large freedom chi values
+ * chi_x - chi square x(p) values for approximating large freedom chi values
  *
  * Calculated by:
  *
