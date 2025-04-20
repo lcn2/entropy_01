@@ -13,28 +13,6 @@ sudo make install clobber
 ```
 
 
-# To use
-
-```sh
-/usr/local/bin/entropy_01 [-h] [-V] [-m maxlen] [-i ignsize]
-
-    -h            print help message and exit
-    -V            print version string and exit
-
-    -m maxlen     do not scan more than maxlen octets per line (def: BUFSIZ)
-    -i ignsize    ignore lines smaller than ignsize octets (def: 0)
-
-Exit codes:
-    0         all OK
-    1         -o offset beyond arg count
-    2         -h and help string printed or -V and version string printed
-    3         command line error
- >= 10        internal error
-
-entropy_01 version: 1.2.1 2025-04-05
-```
-
-
 # Examples
 
 ```sh
@@ -72,6 +50,28 @@ chi^2 [0.00-0.01]%:	0	  0.00%
 chi^2 [excess]:		0	  0.00%
 
 entropy bit est: 0 bits	  2.00%
+```
+
+
+# To use
+
+```
+/usr/local/bin/entropy_01 [-h] [-V] [-m maxlen] [-i ignsize]
+
+    -h            print help message and exit
+    -V            print version string and exit
+
+    -m maxlen     do not scan more than maxlen octets per line (def: BUFSIZ)
+    -i ignsize    ignore lines smaller than ignsize octets (def: 0)
+
+Exit codes:
+    0         all OK
+    1         -o offset beyond arg count
+    2         -h and help string printed or -V and version string printed
+    3         command line error
+ >= 10        internal error
+
+entropy_01 version: 1.2.1 2025-04-05
 ```
 
 
